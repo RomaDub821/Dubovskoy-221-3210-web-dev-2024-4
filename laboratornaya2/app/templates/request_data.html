@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Request Data{% endblock %}
+{% block heading %}Request Data{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>URL Parameters:</h2>
+    <pre>{{ url_params }}</pre>
+    <h2>Request Headers:</h2>
+    <pre>{{ headers }}</pre>
+    <h2>Cookies:</h2>
+    <pre>{{ cookies }}</pre>
+    <h2>Form Data:</h2>
+    <pre>{{ form_data }}</pre>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+/* Общие стили */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa; /* Цвет фона */
+}
+
+.container {
+    background-color: #ffffff; /* Цвет контейнера */
+    border-radius: 10px; /* Закругленные края */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Тень контейнера */
+    padding: 20px; /* Отступы внутри контейнера */
+}
+
+.navbar {
+    background-color: #ffffff; /* Цвет фона навигационной панели */
+}
+
+.navbar-brand {
+    color: #343a40; /* Цвет текста ссылки в навигационной панели */
+}
+
+.nav-link {
+    color: #343a40; /* Цвет текста ссылок в навигационной панели */
+}
+
+footer {
+    background-color: #343a40; /* Цвет фона подвала */
+    color: #ffffff; /* Цвет текста в подвале */
+    text-align: center; /* Выравнивание текста по центру */
+    padding: 20px; /* Отступы внутри подвала */
+}
+
+/* Анимации */
+
+/* Плавное изменение цвета фона для ссылок при наведении */
+.nav-link:hover {
+    background-color: #dee2e6; /* Цвет фона при наведении */
+    transition: background-color 0.3s ease; /* Плавное изменение за 0.3 секунды */
+}
+
+/* Анимация для кнопок */
+.btn {
+    background-color: #007bff; /* Цвет кнопок */
+    color: #ffffff; /* Цвет текста на кнопках */
+    border: none; /* Убираем границу */
+    border-radius: 5px; /* Закругляем края */
+    padding: 10px 20px; /* Отступы внутри кнопок */
+    cursor: pointer; /* Изменение курсора при наведении */
+    transition: background-color 0.3s ease; /* Плавное изменение цвета фона */
+}
+
+/* Плавное изменение цвета фона кнопок при наведении */
+.btn:hover {
+    background-color: #0056b3; /* Цвет кнопок при наведении */
+}
+
+/* Подсветка поля формы при ошибке */
+.form-control.is-invalid {
+    border-color: #dc3545; /* Цвет границы при ошибке */
+}
+
+.invalid-feedback {
+    color: #dc3545; /* Цвет текста сообщения об ошибке */
+}
+
+/* Анимация для форматированного номера телефона */
+.formatted-number {
+    animation: slide-in 0.5s ease; /* Анимация появления */
+}
+.footer {
+    background-color: #343a40; /* Цвет фона подвала */
+    color: #000000; /* Цвет текста в подвале */
+    text-align: center; /* Выравнивание текста по центру */
+    padding: 20px; /* Отступы внутри подвала */
+    position: fixed; /* Закрепляем футер */
+    width: 100%; /* Ширина футера по всей ширине страницы */
+    bottom: 0; /* Футер прижимаем к нижнему краю страницы */
+}
+@keyframes slide-in {
+    from {
+        opacity: 0; /* Начальная прозрачность */
+        transform: translateY(-20px); /* Начальное положение (сдвиг вверх) */
+    }
+    to {
+        opacity: 1; /* Конечная прозрачность */
+        transform: translateY(0); /* Конечное положение (без сдвига) */
+    }
+}
