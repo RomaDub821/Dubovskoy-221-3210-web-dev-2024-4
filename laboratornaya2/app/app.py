@@ -47,10 +47,10 @@ def format_phone_number(phone_number):
     length = len(cleaned_number)
     
     if length == 11 and cleaned_number.startswith('8'):
-        cleaned_number = '7' + cleaned_number[1:]
+        cleaned_number = '8' + cleaned_number[1:]
     
     if length == 10:
-        formatted_number = f'7-{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:8]}-{cleaned_number[8:]}'
+        formatted_number = f'8-{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:8]}-{cleaned_number[8:]}'
     elif length == 11:
         formatted_number = f'{cleaned_number[:1]}-{cleaned_number[1:4]}-{cleaned_number[4:7]}-{cleaned_number[7:9]}-{cleaned_number[9:]}'
     else:
