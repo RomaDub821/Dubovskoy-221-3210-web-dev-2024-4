@@ -46,7 +46,7 @@ def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
     length = len(cleaned_number)
     
-    if length == 11 and cleaned_number.startswith('8'):
+    if length == 11 and cleaned_number.startswith('7'):
         cleaned_number = '8' + cleaned_number[1:]
     
     if length == 10:
