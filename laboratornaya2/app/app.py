@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-import re
 
 app = Flask(__name__)
 
@@ -28,31 +27,34 @@ def phone():
     return render_template('phone_form.html', error=error, formatted_number=formatted_number)
 
 def validate_phone_number(phone_number):
+    if not phone_number:
+        return "Введите номер телефона"
+
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
     length = len(cleaned_number)
     
-    if not cleaned_number:
-        return "Введите номер телефона"
-    elif length not in [10, 11]:
-        return "Недопустимый ввод. Неверное количество цифр."
-    elif length == 11 and not (cleaned_number.startswith(('7', '8'))):
+    if length not in [10, 11]:
+        return "Недопустимый ввод. Номер должен содержать 10 или 11 цифр."
+    
+    if length == 11 and not (cleaned_number.startswith(('7', '8'))):
         return "Недопустимый ввод. Номер должен начинаться с '+7' или '8'."
-    elif not phone_number.replace('+', '').replace('-', '').replace('(', '').replace(')', '').replace('.', '').replace(' ', '').isdigit():
-        return "Недопустимый ввод. В номере телефона встречаются недопустимые символы."
-    else:
-        return None
+    
+    if not cleaned_number.isdigit():
+        return "Недопустимый ввод. В номере телефона должны быть только цифры."
+    
+    return None
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
     length = len(cleaned_number)
-    
+
     if length == 11 and cleaned_number.startswith('7'):
         cleaned_number = '8' + cleaned_number[1:]
-    
+
     if length == 10:
         formatted_number = f'8-{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:8]}-{cleaned_number[8:]}'
     elif length == 11:
-        formatted_number = f'{cleaned_number[:1]}-{cleaned_number[1:4]}-{cleaned_number[4:7]}-{cleaned_number[7:9]}-{cleaned_number[9:]}'
+        formatted_number = f'{cleaned_number[0]}-{cleaned_number[1:4]}-{cleaned_number[4:7]}-{cleaned_number[7:9]}-{cleaned_number[9:]}'
     else:
         return "Недопустимый ввод. Неверное количество цифр или некорректный формат номера."
     

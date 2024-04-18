@@ -4,14 +4,14 @@
 {% block content %}
 <form method="post">
     <div class="form-group">
-        <label for="phone_number">Введите номер телефона для форматированияr</label>
+        <label for="phone_number">Введите номер телефона для форматирования</label>
         <input type="text" name="phone_number" class="form-control{% if error %} is-invalid{% endif %}"
             placeholder="Номер телефона:">
         {% if error %}
         <div class="invalid-feedback">{{ error }}</div>
         {% endif %}
     </div>
-    <button type="submit" class="btn btn-primary">Проверить формат введённого номера телефона</button>
+    <button type="submit" class="btn btn-primary">Проверить формат введенного номера телефона</button>
 </form>
 {% if formatted_number %}
 <div class="mt-3">
