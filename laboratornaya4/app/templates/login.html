@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="my-5">Авторизация</h1>
+
+        <form action="#" method="post">
+            <div class="mb-3">
+                <label for="login" class="form-label">Логин</label>
+                <input
+                    type="text"
+                    placeholder="Введите логин"
+                    id="login"
+                    class="form-control"
+                    name="login"
+                    value="{{ request.form.login }}" />
+                <label for="password" class="form-label">Пароль</label>
+                <input
+                    type="password"
+                    placeholder="Введите пароль"
+                    id="password"
+                    class="form-control"
+                    name="password" />
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="remember"
+                    id="remember" />
+                <label class="form-check-label" for="remember">
+                    Запомнить меня
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Войти</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
