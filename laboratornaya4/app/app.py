@@ -3,6 +3,8 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from mysqldb import DBConnector
 from mysql.connector.errors import DatabaseError
 import config
+import hashlib
+
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -201,8 +203,57 @@ def create_user():
             except DatabaseError as error:
                 flash(f'Ошибка создания пользователя! {error}', category="danger")    
                 db_connector.connect().rollback()
-
+        else:
+            return render_template("user_form.html", user=user, roles=roles, errors=errors)
     return render_template("user_form.html", user=user, roles=roles, errors=errors)
+
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+        
+        current_user_id = current_user.id
+        query = 'SELECT password_hash FROM users WHERE id = %s'
+        cursor = db_connector.connect().cursor(named_tuple=True)
+        cursor.execute(query, (current_user_id,))
+        user = cursor.fetchone()
+        
+        if not user or not check_password(user.password_hash, old_password):
+            flash('Неверный старый пароль', category='danger')
+            return render_template('change_password.html')
+        
+        password_errors = validate_password(new_password)
+        if password_errors:
+            for error in password_errors:
+                flash(error, category='danger')
+            return render_template('change_password.html')
+
+        if new_password != confirm_password:
+            flash('Новый пароль и подтверждение пароля не совпадают', category='danger')
+            return render_template('change_password.html')
+        
+        new_password_hash = hash_password(new_password)
+        update_query = 'UPDATE users SET password_hash = %s WHERE id = %s'
+        try:
+            cursor.execute(update_query, (new_password_hash, current_user_id))
+            db_connector.connect().commit()
+            flash('Ваш пароль был успешно изменён.', category='success')
+            return redirect(url_for('index'))
+        except DatabaseError as error:
+            db_connector.connect().rollback()
+            flash(f'Ошибка при изменении пароля: {error}', category='danger')
+    return render_template('change_password.html')
+
+def hash_password(password):
+    """ Создание хеша пароля. """
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def check_password(stored_hash, provided_password):
+    """ Проверка пароля. """
+    return stored_hash == hash_password(provided_password)
 
 
 @app.route('/users/<int:user_id>')

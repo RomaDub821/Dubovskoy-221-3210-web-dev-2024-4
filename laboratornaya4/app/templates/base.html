@@ -59,16 +59,15 @@
                             </li>
                             {% endif %}
                             
-                            <!-- {% if current_user.is_authenticated %}
+                            {% if current_user.is_authenticated %}
                             <li class="nav-item">
                                 <a
                                     class="nav-link active"
                                     aria-current="page"
-        
-                                    >Сменить пароль</a
+                                    href="{{ url_for('change_password') }}">Сменить пароль</a
                                 >
                             </li>
-                            {% endif %} -->
+                            {% endif %}
                             <li class="nav-item">
                                 {% if current_user.is_authenticated %}
                                 <a
