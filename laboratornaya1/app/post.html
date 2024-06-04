@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <article class="my-5">
+        <h1 class="mb-3">{{ post.title }}</h1>
+        <p class="text-muted">Автор: {{ post.author }} | Опубликовано: {{ post.date.strftime('%d.%m.%Y') }}</p>
+        <img class="img-fluid mb-3" src="{{ url_for('static', filename='images/' + post.image_id) }}" alt="Post image">
+        <div class="post-content mb-5">
+            {{ post.text }}
+        </div>
+
+        <section class="comments">
+            <h2>Комментарии</h2>
+            <ul class="list-unstyled">
+                {% for comment in post.comments %}
+                    <li class="mb-3">
+                        <strong>{{ comment.author }}</strong>
+                        <p>{{ comment.text }}</p>
+                        {% if comment.replies %}
+                            <ul class="list-unstyled ms-4">
+                                {% for reply in comment.replies %}
+                                    <li class="mb-2">
+                                        <strong>{{ reply.author }}</strong>
+                                        <p>{{ reply.text }}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="comment-form my-5">
+            <h2>Оставьте комментарий</h2>
+            <form action="#" method="post">
+                <div class="mb-3">
+                    <label for="commentText" class="form-label">Комментарий</label>
+                    <textarea class="form-control" id="commentText" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+        </section>
+    </article>
+{% endblock %}
