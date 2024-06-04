@@ -24,8 +24,10 @@
             <td>{{ user.middle_name or '' }}</td>
             <td>{{ user.role_name or 'Нет роли' }}</td>
             <td>
+                
                 {% if current_user.is_authenticated %}
                     {% if current_user.can('edit', user) %}
+                        <a href="{{ url_for('users.view_user', user_id=user.id) }}" class="btn btn-info">Просмотр</a>
                         <a class="btn btn-primary" href="{{ url_for('users.edit', user_id=user.id) }}">Редактировать</a>
                     {% endif %}
                     {% if current_user.can('delete', user) %}

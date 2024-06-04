@@ -3,6 +3,7 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from mysqldb import DBConnector
 from mysql.connector.errors import DatabaseError
 import config
+from utils import validate_user_data
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -14,71 +15,43 @@ login_manager.login_message_category = "warning"
 
 db_connector = DBConnector(app)
 
+# Register blueprints
 from authorization import bp as authorization_bp, init_login_manager
-app.register_blueprint(authorization_bp)
-init_login_manager(app)
-
 from users import bp as users_bp
-app.register_blueprint(users_bp)
+from logs import logs_bp
+from reports import reports_bp  # Import and register the reports blueprint
 
-from action_logs import logs_bp
+init_login_manager(app)
+app.register_blueprint(authorization_bp)
+app.register_blueprint(users_bp)
 app.register_blueprint(logs_bp)
+app.register_blueprint(reports_bp)  # Register the reports blueprint
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 class User(UserMixin):
     def __init__(self, user_id, login):
         self.id = user_id
         self.login = login
-# здесь ошибка
-@app.before_request
-def user_actions_logger():
 
+@app.before_request
+def log_user_visit():
     if request.endpoint == 'static' or request.path == '/favicon.ico':
         return
 
-    url = request.path
     user_id = current_user.id if current_user.is_authenticated else None
-    
+    path = request.path
+
     try:
         db_connection = db_connector.connect()
         with db_connection.cursor(named_tuple=True) as cursor:
-            cursor.execute("INSERT INTO action_logs (user_id, path) VALUES (%s, %s)", (user_id, url))
+            cursor.execute("INSERT INTO visit_logs (path, user_id) VALUES (%s, %s)", (path, user_id))
             db_connection.commit()
     except DatabaseError as error:
-        print(f"Произошла ошибка БД: {error}")
+        print(f"Database error occurred: {error}")
         if db_connection:
             db_connection.rollback()
-
-def validate_password(password):
-    errors = []
-    
-    if not (8 <= len(password) <= 128):
-        errors.append("Пароль должен содержать от 8 до 128 символов")
-    if not any(char.isupper() for char in password):
-        errors.append("Пароль должен содержать как минимум одну заглавную букву")
-    if not any(char.islower() for char in password):
-        errors.append("Пароль должен содержать как минимум одну строчную букву")
-    if not any(char.isdigit() for char in password):
-        errors.append("Пароль должен содержать как минимум одну цифру")
-    if ' ' in password:
-        errors.append("Пароль не должен содержать пробелы")
-    allowed_symbols = r"~!?\@#\$%\^&\*_\-\+\(\)\[\]\{\}<>\\/\"'\.,:;"
-    if not all(char.isalnum() or char in allowed_symbols for char in password):
-        errors.append("Пароль может содержать только латинские или кириллические буквы, цифры "
-                      "и следующие символы: ~ ! ? @ # $ % ^ & * _ - + ( ) [ ] { } > < / \\ | \" ' . , : ;")
-    return errors
-
-def validate_user_data(user_data):
-    errors = {}
-    required_fields = ['login', 'password', 'last_name', 'first_name']
-    for field in required_fields:
-        if not user_data.get(field):
-            errors[field] = "Это поле не может быть пустым"
-    if len(user_data.get('login', '')) < 5:
-        errors['login'] = "Логин должен содержать не менее 5 символов"
-    password_errors = validate_password(user_data.get('password', ''))
-    if password_errors:
-        errors['password'] = ", ".join(password_errors)
-    return errors
 
 def get_roles():
     query = "SELECT * FROM roles"
@@ -99,14 +72,13 @@ def load_user(user_id):
     query = "SELECT id, login FROM users WHERE id=%s"
 
     with db_connector.connect().cursor(named_tuple=True) as cursor:
-
         cursor.execute(query, (user_id,))
-        
+
         user = cursor.fetchone()
 
     if user:
         return User(user_id, user.login)
-    
+
     return None
 
 @app.route('/')
@@ -126,7 +98,6 @@ def login():
     print(query)
 
     with db_connector.connect().cursor(named_tuple=True) as cursor:
-
         cursor.execute(query, (login, password))
 
         print(cursor.statement)
@@ -139,8 +110,8 @@ def login():
         target_page = request.args.get("next", url_for("index"))
         return redirect(target_page)
 
-    flash("Введены некорректные учётные данные пользователя", category="danger")   
-   
+    flash("Введены некорректные учётные данные пользователя", category="danger")
+
     return render_template("login.html")
 
 @app.route('/users')
@@ -149,7 +120,7 @@ def users():
 
     with db_connector.connect().cursor(named_tuple=True) as cursor:
         cursor.execute(query)
-        data = cursor.fetchall() 
+        data = cursor.fetchall()
 
     return render_template("users.html", users=data)
 
@@ -182,12 +153,12 @@ def edit_user(user_id):
             with db_connector.connect().cursor(named_tuple=True) as cursor:
                 cursor.execute(query, user)
                 db_connector.connect().commit()
-            
+
             flash("Запись пользователя успешно обновлена", category="success")
             return redirect(url_for('users'))
         except DatabaseError as error:
             flash(f'Ошибка редактирования пользователя! {error}', category="danger")
-            db_connector.connect().rollback()    
+            db_connector.connect().rollback()
 
     return render_template("edit_user.html", user=user, roles=roles)
 
@@ -199,13 +170,13 @@ def delete_user(user_id):
     try:
         with db_connector.connect().cursor(named_tuple=True) as cursor:
             cursor.execute(query, (user_id, ))
-            db_connector.connect().commit() 
-        
+            db_connector.connect().commit()
+
         flash("Запись пользователя успешно удалена", category="success")
     except DatabaseError as error:
         flash(f'Ошибка удаления пользователя! {error}', category="danger")
-        db_connector.connect().rollback()    
-    
+        db_connector.connect().rollback()
+
     return redirect(url_for('users'))
 
 @app.route('/users/new', methods=['GET', 'POST'])
@@ -228,19 +199,18 @@ def create_user():
                     db_connector.connect().commit()
                 return redirect(url_for('users'))
             except DatabaseError as error:
-                flash(f'Ошибка создания пользователя! {error}', category="danger")    
+                flash(f'Ошибка создания пользователя! {error}', category="danger")
                 db_connector.connect().rollback()
 
     return render_template("user_form.html", user=user, roles=roles, errors=errors)
 
-
 @app.route('/users/<int:user_id>')
 def view_user(user_id):
     query = """
-        SELECT users.id, users.login, users.last_name, users.first_name, 
-               users.middle_name, roles.name as role_name 
-        FROM users 
-        LEFT JOIN roles ON users.role_id = roles.id 
+        SELECT users.id, users.login, users.last_name, users.first_name,
+               users.middle_name, roles.name as role_name
+        FROM users
+        LEFT JOIN roles ON users.role_id = roles.id
         WHERE users.id=%s
     """
     with db_connector.connect().cursor(named_tuple=True) as cursor:

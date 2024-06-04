@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Добро пожаловать в приют для домашних животных "Собачки в ручки"</h2>
+    <p>Наша цель - уменьшить количество животных без хозяина и увеличить количество людей с питомцами!</p>
+</div>
+<div class="card-container">
+    {% for pet in pets %}
+    <div class="card">
+        <img src="{{ url_for('static', filename='images/' ~ pet.image_file) }}" alt="{{ pet.name }}">
+        <h2>{{ pet.name }}</h2>
+        <p>Возраст: {{ pet.age }}</p>
+        <p>Город: {{ pet.city }}</p>
+        <a href="{{ url_for('main.pet_details', pet_id=pet.id) }}" class="btn">Подробнее</a>
+        <form action="{{ url_for('main.add_to_favorites', pet_id=pet.id) }}" method="POST">
+            <button type="submit" class="btn">Добавить в избранное</button>
+        </form>
+    </div>
+    {% endfor %}
+    <h2>Питомцы</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        Возраст {{ form.age }}
+    </div>
+    <div>
+        Размер {{ form.size }}
+    </div>
+    <div>
+       Окрас {{ form.color }}
+    </div>
+    <div>
+        Пол {{ form.gender }}
+    </div>
+    <div>
+        Минимальная стоимость {{ form.price_min }}
+    </div>
+    <div>
+        Максимальная стоимость {{ form.price_max }}
+    </div>
+    <div>
+        {{ form.submit }}
+    </div>
+</form>
+<div>
+    {% for pet in pets %}  //Ошибка из-за pets ыместо pet
+        <div class="pet-card">
+            <h3>{{ pet.name }}</h3>
+            <p>{{ pet.description }}</p>
+            <p><strong>Возраст:</strong> {{ pet.age }}</p>
+            <p><strong>Размер:</strong> {{ pet.size }}</p>
+            <p><strong>Цена:</strong> {{ pet.price }}</p> 
+        </div>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

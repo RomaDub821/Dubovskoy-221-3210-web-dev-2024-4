@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Избранное{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <h2>Избранные питомцы</h2>
+        <ul>
+            {% for favorite in favorites %}
+                <li>{{ favorite.pet.name }} - <a href="{{ url_for('main.pet_details', pet_id=favorite.pet.id) }}">Подробнее</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

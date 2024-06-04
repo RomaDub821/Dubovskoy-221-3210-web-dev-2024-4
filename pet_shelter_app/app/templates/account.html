@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Account{% endblock %}
+{% block content %}
+<h2>Личный кабинет</h2>
+<form method="POST" enctype="multipart/form-data">
+    {{ edit_form.hidden_tag() }}
+    <div class="form-group">
+       Изменить Имя {{ edit_form.name }}
+    </div>
+    <div class="form-group">
+        Изменить Фамилию {{ edit_form.surname }}
+    </div>
+    <div class="form-group">
+        Изменить Отчество {{ edit_form.patronymic }}
+    </div>
+    <div class="form-group">
+        Изменить Номер телефона {{ edit_form.phone_number }}
+    </div>
+    <div class="form-group">
+        Изменить Почту {{ edit_form.email }}
+    </div>
+    <div class="form-group">
+        Изменить Адрес {{ edit_form.address }}
+    </div>
+    <div class="form-group">
+        Изменить Город {{ edit_form.city }}
+    </div>
+    <div class="form-group">
+        Изменить Предпочтения {{ edit_form.preferences }}
+    </div>
+    <div class="form-group">
+        {{ edit_form.submit }}
+    </div>
+</form>
+<h3>Загрузить аватар профиля</h3>
+<form method="POST" enctype="multipart/form-data">
+    {{ avatar_form.hidden_tag() }}
+    <div class="form-group">
+        Аватар {{ avatar_form.avatar }}
+    </div>
+    <div class="form-group">
+        {{ avatar_form.submit }}
+    </div>
+</form>
+{% endblock %}

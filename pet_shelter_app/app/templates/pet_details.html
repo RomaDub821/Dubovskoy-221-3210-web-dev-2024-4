@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pet.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ pet.name }}</h2>
+    <img src="{{ url_for('static', filename='images/' ~ pet.image_file) }}" alt="{{ pet.name }}">
+    <p>Размер: {{ pet.size }}</p>
+    <p>Возраст: {{ pet.age }}</p>
+    <p>Окрас: {{ pet.color }}</p>
+    <p>Длина шерсти: {{ pet.hair_length }}</p>
+    <p>Пол: {{ pet.gender }}</p>
+    <p>Описание: {{ pet.description }}</p>
+    <p>Цена: {{ pet.price }}</p>
+    <p>Информация о партнёре: {{ pet.partner_info }}</p>
+    <p>Город: {{ pet.city }}</p>
+    <p>Доступность: {{ pet.availability }}</p>
+    <a href="{{ url_for('main.edit_pet', pet_id=pet.id) }}">Редактировать</a>
+    <form method="POST" action="{{ url_for('main.delete_pet', pet_id=pet.id) }}" style="display:inline;">
+        <button type="submit">Удалить</button>
+    </form>
+</div>
+{% endblock %}

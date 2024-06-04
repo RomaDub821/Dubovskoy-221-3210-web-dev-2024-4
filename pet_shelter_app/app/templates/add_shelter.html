@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить приют{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Добавить приют</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.name.label }} {{ form.name }}
+        </div>
+        <div class="form-group">
+            {{ form.phone_number.label }} {{ form.phone_number }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label }} {{ form.email }}
+        </div>
+        <div class="form-group">
+            {{ form.address.label }} {{ form.address }}
+        </div>
+        <div class="form-group">
+            {{ form.city.label }} {{ form.city }}
+        </div>
+        <div class="form-group">
+            {{ form.zip_code.label }} {{ form.zip_code }}
+        </div>
+        <div class="form-group">
+            {{ form.submit }}
+        </div>
+    </form>
+</div>
+{% endblock %}
