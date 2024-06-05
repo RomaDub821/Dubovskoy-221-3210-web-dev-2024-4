@@ -1,0 +1,14 @@
+{% macro show_reviews(reviews) %}
+<div class="container-fluid row mt-3 mb-3 gap-3">
+    {% for review in reviews %}
+    <div class="p-3 border rounded mb-3 col-md-4 align-items-center">
+        <div class="d-flex">
+            <h4 class="text-uppercase">{{ review.user.first_name }}</h4>
+            <p class="ms-auto rating">{{ review.get_rating_str() }}</p>
+        </div>
+        <p class="text-muted">{{ review.created_at }}</p>
+        <p>{{ review.text }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}

@@ -30,7 +30,7 @@ def index():
         flash(f"Произошла ошибка при получении данных журнала посещений: {error}", "danger")
         return render_template('visit_logs.html', logs=[], page=page, per_page=per_page, total_logs=total_logs)
     finally:
-        db_connection.close()  # Ensure the connection is closed
+        db_connection.close()
 
     return render_template('visit_logs.html', logs=logs, page=page, per_page=per_page, total_logs=total_logs)
 
@@ -51,7 +51,7 @@ def users_stat():
         print(f"Произошла ошибка БД: {error}")
         return render_template("users_stat.html", logs=logs)
     finally:
-        db_connection.close()  # Ensure the connection is closed
+        db_connection.close()
 
 @reports_bp.route('/pages_stat')
 def pages_stat():
@@ -67,7 +67,7 @@ def pages_stat():
         flash(f"Произошла ошибка при получении данных отчёта по страницам: {error}", "danger")
         return render_template('pages_report.html', pages=[])
     finally:
-        db_connection.close()  # Ensure the connection is closed
+        db_connection.close()
 
     return render_template('pages_report.html', pages=pages)
 
@@ -93,7 +93,7 @@ def pages_report_csv():
         flash(f"Произошла ошибка при экспорте данных отчёта по страницам: {error}", "danger")
         return redirect(request.referrer)
     finally:
-        db_connection.close()  # Ensure the connection is closed
+        db_connection.close()
 
 @reports_bp.route('/users_report')
 def users_report():
@@ -112,7 +112,7 @@ def users_report():
         flash(f"Произошла ошибка при получении данных отчёта по пользователям: {error}", "danger")
         return render_template('users_report.html', users=[])
     finally:
-        db_connection.close()  # Ensure the connection is closed
+        db_connection.close()
 
     return render_template('users_report.html', users=users)
 
@@ -141,4 +141,4 @@ def users_report_csv():
         flash(f"Произошла ошибка при экспорте данных отчёта по пользователям: {error}", "danger")
         return redirect(request.referrer)
     finally:
-        db_connection.close()  # Ensure the connection is closed
+        db_connection.close()

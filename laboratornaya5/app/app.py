@@ -15,17 +15,16 @@ login_manager.login_message_category = "warning"
 
 db_connector = DBConnector(app)
 
-# Register blueprints
 from authorization import bp as authorization_bp, init_login_manager
 from users import bp as users_bp
 from logs import logs_bp
-from reports import reports_bp  # Import and register the reports blueprint
+from reports import reports_bp
 
 init_login_manager(app)
 app.register_blueprint(authorization_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(logs_bp)
-app.register_blueprint(reports_bp)  # Register the reports blueprint
+app.register_blueprint(reports_bp)
 
 if __name__ == "__main__":
     app.run(debug=True)

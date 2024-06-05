@@ -5,16 +5,16 @@ class UsersPolicy:
         self.user = user
 
     def create(self):
-        return current_user.role_id == 3  # Admin role
+        return current_user.role_id == 3 
 
     def delete(self):
-        return current_user.role_id == 3  # Admin role
+        return current_user.role_id == 3
 
     def edit(self):
-        return self.user.id == current_user.id or current_user.role_id == 3  # Admin or self
+        return self.user.id == current_user.id or current_user.role_id == 3
 
     def show(self):
-        return self.user.id == current_user.id or current_user.role_id == 3  # Admin or self
+        return self.user.id == current_user.id or current_user.role_id == 3 
 
     def assign_roles(self):
-        return current_user.role_id == 3  # Admin role
+        return current_user.role_id == 3 

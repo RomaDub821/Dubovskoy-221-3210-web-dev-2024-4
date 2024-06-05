@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% from 'pagination.html' import render_pagination %}
+{% from 'reviews/show.html' import show_reviews %}
+{% from 'reviews/own_review.html' import own_review %}
+
+{% block content %}
+<div class="container">
+    <div class="my-5">
+
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">Отзывы на курс {{ course.name }}</h2>
+
+        <form class="mb-5 mt-3 row align-items-center">
+            <div class="col-md-4 my-3">
+                <select class="form-select" id="type_sort" name="type_sort" title="Сортировка отзывов">
+                    {% for sort_type in sort_types %}
+                    <option value="{{ sort_type.value[0] }}"
+                            {% if request.args.get(
+                    'type_sort')|int == sort_type.value[0] %}selected{% endif %}>
+                    {{ sort_type.value[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2 my-3 align-self-end">
+                <button type="submit" class="btn btn-dark w-100 mt-auto">Применить</button>
+            </div>
+        </form>
+    </div>
+
+    {{ show_reviews(reviews) }}
+
+    {{ render_pagination(pagination, request.endpoint, search_params) }}
+
+    {{ own_review(user_review, course, current_user, grades) }}
+
+
+</div>
+{% endblock %}

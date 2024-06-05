@@ -11,14 +11,14 @@ def index():
     per_page = 10
     logs = []
     total_logs = 0
-    total_pages = 1  # Ensure total_pages is always defined
+    total_pages = 1
 
     try:
         db_connection = db_connector.connect()
         with db_connection.cursor(named_tuple=True) as cursor:
             cursor.execute("SELECT COUNT(*) AS count FROM visit_logs")
             result = cursor.fetchone()
-            total_logs = result.count if result else 0  # Ensure total_logs is assigned correctly
+            total_logs = result.count if result else 0
 
             offset = (page - 1) * per_page
             query = ("SELECT visit_logs.id, users.login, visit_logs.path, visit_logs.created_at "
@@ -27,13 +27,13 @@ def index():
                      "LIMIT %s OFFSET %s")
             cursor.execute(query, (per_page, offset))
             logs = cursor.fetchall()
-            print(f"Fetched logs: {logs}")  # Debugging line to see fetched logs
+            print(f"Fetched logs: {logs}")
     except DatabaseError as error:
         print(f"Database error occurred: {error}")
         flash(f"Произошла ошибка при получении данных журнала посещений: {error}", "danger")
     finally:
         if db_connection.is_connected():
-            db_connection.close()  # Ensure the connection is closed
+            db_connection.close()
 
     total_pages = math.ceil(total_logs / per_page)
 

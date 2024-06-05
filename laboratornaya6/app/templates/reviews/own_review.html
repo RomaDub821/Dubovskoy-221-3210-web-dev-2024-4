@@ -1,0 +1,50 @@
+{% macro own_review(review, course, current_user, grades) %}
+{% if review and review.id %}
+<div class="d-flex flex-column align-items-center">
+    <h2 class="mb-3 text-center text-uppercase font-weight-bold">Ваш отзыв</h2>
+    <div class="col-md-6 p-3 border rounded mb-3">
+        <div class="d-flex">
+            <h4 class="text-uppercase">{{ review.user.first_name }}</h4>
+            <p class="ms-auto rating">{{ review.get_rating_str() }}</p>
+        </div>
+        <p class="text-muted">{{ review.created_at }}</p>
+        <p>{{ review.text }}</p>
+    </div>
+</div>
+{% else %}
+<div class="d-flex flex-column align-items-center">
+    <h2 class="mb-3 text-center text-uppercase font-weight-bold">Добавьте отзыв</h2>
+    <form method="POST" action="{{ url_for('courses.create_review', course_id=course.id) }}"
+          class="p-3 border rounded col-md-6">
+        <input type="hidden" name="user_id" value="{{ current_user.id }}">
+        <input type="hidden" name="course_id" value="{{ course.id }}">
+        <div class="mb-3 row">
+            <div class="d-flex flex-column">
+                <div class="mb-3">
+                    <label for="rating">Оценка</label>
+                    <select class="form-select" name="rating" id="rating">
+                        {% for i in range(grades | length) %}
+                        <option {% if review and review.rating== i or not review and i== 5
+                                %}selected{% endif %}
+                                value="{{ i }}">{{
+                            grades[i] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3 d-flex flex-column flex-grow-1">
+                    <label for="review_text">Текст отзыва</label>
+                    <textarea class="form-control flex-grow-1" name="text" id="review_text"
+                              cols="30"
+                              rows="5">{{ review.text or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3 text-center">
+            <input type="submit" class="btn btn-dark" value="Добавить отзыв">
+        </div>
+    </form>
+</div>
+{% endif %}
+{% endmacro %}
