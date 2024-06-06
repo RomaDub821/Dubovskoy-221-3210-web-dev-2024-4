@@ -37,13 +37,13 @@
         Город {{ form.city }}
     </div>
     <div class="form-group">
-        Доступность {{ form.availability }}
+        Доступность {{ form.availability(class="form-control") }}
     </div>
     <div class="form-group">
-       ID приюта {{ form.shelter_id }}
+       ID приюта {{ form.shelter_id(class="form-control") }}
     </div>
     <div class="form-group">
-        Загрузить фотографию {{ form.image_file }}
+        Загрузить фотографию {{ form.image_file(class="form-control") }}
     </div>
     <div class="form-group">
         {{ form.submit }}

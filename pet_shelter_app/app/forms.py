@@ -52,7 +52,7 @@ class AddPetForm(FlaskForm):
     price = DecimalField('Price', validators=[DataRequired()])
     partner_info = TextAreaField('Partner Info', validators=[Optional(), Length(max=200)])
     city = StringField('City', validators=[DataRequired(), Length(min=2, max=100)])
-    availability = BooleanField('Available', default=True)
+    availability = SelectField('Availability', choices=[(1, 'Available'), (0, 'Not Available')], coerce=int, validators=[DataRequired()])
     shelter_id = SelectField('Shelter', coerce=int, validators=[DataRequired()])
     image_file = FileField('Upload Image', validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField('Add Pet')

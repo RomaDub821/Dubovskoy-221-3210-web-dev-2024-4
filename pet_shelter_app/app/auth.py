@@ -92,7 +92,7 @@ def account():
         shelters = Shelter.query.all()
         edit_form.shelter_id.choices = [(shelter.id, shelter.name) for shelter in shelters]
     else:
-        edit_form.shelter_id.choices = []  # Очищаем choices для других ролей
+        edit_form.shelter_id.choices = [] 
 
     if edit_form.validate_on_submit() and 'edit_user' in request.form:
         user.name = edit_form.name.data
@@ -107,7 +107,7 @@ def account():
         if user.role == 'representative' and edit_form.shelter_id.data:
             user.shelter_id = edit_form.shelter_id.data
         else:
-            user.shelter_id = None  # Очищаем shelter_id для других ролей
+            user.shelter_id = None  
         db.session.commit()
         flash('Аккаунт успешно обновлен', 'success')
         return redirect(url_for('auth.account'))

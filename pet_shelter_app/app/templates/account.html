@@ -28,11 +28,6 @@
     <div class="form-group">
         Изменить Предпочтения {{ edit_form.preferences }}
     </div>
-    {% if current_user.role == 'representative' %}
-    <div class="form-group">
-        Изменить Приют {{ edit_form.shelter_id }}
-    </div>
-    {% endif %}
     <div class="form-group">
         {{ edit_form.submit }}
     </div>

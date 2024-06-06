@@ -39,7 +39,7 @@ class Pet(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     partner_info = db.Column(db.Text, nullable=True)
     city = db.Column(db.String(100), nullable=False)
-    availability = db.Column(db.Boolean, nullable=False)
+    availability = db.Column(db.Boolean, default=True)
     shelter_id = db.Column(db.Integer, db.ForeignKey('shelter.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     image_file = db.Column(db.String(100), nullable=True)

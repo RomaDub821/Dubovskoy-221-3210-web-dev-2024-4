@@ -96,7 +96,7 @@ def add_pet():
 @login_required
 def edit_pet(pet_id):
     pet = Pet.query.get_or_404(pet_id)
-    if current_user.role != 'moderator' and (current_user.role == 'representative' and pet.shelter_id != current_user.shelter_id):
+    if current_user.role != 'moderator' and pet.shelter_id != current_user.shelter_id:
         flash('У вас нет доступа для редактирования этого питомца.', 'danger')
         return redirect(url_for('main.index'))
 
