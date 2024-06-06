@@ -17,8 +17,7 @@ migrate = Migrate()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-
-    # Create the upload directory if it doesn't exist
+    
     if not os.path.exists(app.config['UPLOADED_PHOTOS_DEST']):
         os.makedirs(app.config['UPLOADED_PHOTOS_DEST'])
 

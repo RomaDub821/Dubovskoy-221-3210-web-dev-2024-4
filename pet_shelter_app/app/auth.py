@@ -75,7 +75,7 @@ def edit_user(user_id):
         user.preferences = form.preferences.data
         user.shelter_id = form.shelter_id.data if form.shelter_id.data else None
         db.session.commit()
-        flash('User updated successfully', 'success')
+        flash('Пользователь успешно обновлен', 'success')
         return redirect(url_for('auth.manage_users'))
 
     return render_template('edit_user.html', form=form, user=user)
@@ -109,7 +109,7 @@ def account():
         else:
             user.shelter_id = None  # Очищаем shelter_id для других ролей
         db.session.commit()
-        flash('Account updated successfully', 'success')
+        flash('Аккаунт успешно обновлен', 'success')
         return redirect(url_for('auth.account'))
 
     if avatar_form.validate_on_submit() and 'upload_avatar' in request.form:
@@ -118,30 +118,22 @@ def account():
         avatar.save(os.path.join(current_app.config['UPLOADED_PHOTOS_DEST'], filename))
         user.avatar = filename
         db.session.commit()
-        flash('Avatar updated successfully', 'success')
+        flash('Аватарка успешно загружена', 'success')
         return redirect(url_for('auth.account'))
 
     return render_template('account.html', user=user, edit_form=edit_form, avatar_form=avatar_form, pets=pets)
-
-
-
-
-
-
-
 
 @auth_bp.route('/delete_user/<int:user_id>', methods=['POST'])
 @login_required
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     if current_user.role != 'moderator':
-        flash('Access denied', 'danger')
+        flash('Доступ запрещен', 'danger')
         return redirect(url_for('auth.manage_users'))
     
-    # Отвязать всех питомцев, связанных с пользователем
     pets = Pet.query.filter_by(user_id=user_id).all()
     for pet in pets:
-        pet.user_id = None  # Отвязать питомца от пользователя
+        pet.user_id = None
         db.session.add(pet)
     
     db.session.delete(user)
@@ -155,14 +147,14 @@ def delete_account():
     user = current_user
     db.session.delete(user)
     db.session.commit()
-    flash('Account deleted successfully', 'success')
+    flash('Аккаунт успешно удален', 'success')
     return redirect(url_for('main.index'))
 
 @auth_bp.route('/manage_users', methods=['GET', 'POST'])
 @login_required
 def manage_users():
     if current_user.role != 'moderator':
-        flash('Access denied', 'danger')
+        flash('Доступ запрещен', 'danger')
         return redirect(url_for('main.index'))
 
     users = User.query.all()
@@ -179,7 +171,7 @@ def logout():
 @login_required
 def add_shelter():
     if current_user.role != 'moderator':
-        flash('Access denied', 'danger')
+        flash('Доступ запрещен', 'danger')
         return redirect(url_for('main.index'))
 
     form = AddShelterForm()
@@ -202,7 +194,7 @@ def add_shelter():
 @login_required
 def manage_shelters():
     if current_user.role not in ['representative', 'moderator']:
-        flash('Access denied', 'danger')
+        flash('Доступ запрещен', 'danger')
         return redirect(url_for('main.index'))
 
     shelters = Shelter.query.all()

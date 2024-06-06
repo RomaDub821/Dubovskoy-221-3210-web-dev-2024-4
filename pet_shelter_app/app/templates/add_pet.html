@@ -7,43 +7,43 @@
 <form method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <div class="form-group">
-        {{ form.name.label }} {{ form.name }}
+        Имя {{ form.name }}
     </div>
     <div class="form-group">
-        {{ form.size.label }} {{ form.size }}
+        Размер{{ form.size }}
     </div>
     <div class="form-group">
-        {{ form.age.label }} {{ form.age }}
+        Возраст {{ form.age }}
     </div>
     <div class="form-group">
-        {{ form.color.label }} {{ form.color }}
+        Окрас {{ form.color }}
     </div>
     <div class="form-group">
-        {{ form.hair_length.label }} {{ form.hair_length }}
+        Длина шерсти {{ form.hair_length }}
     </div>
     <div class="form-group">
-        {{ form.gender.label }} {{ form.gender }}
+        Пол {{ form.gender }}
     </div>
     <div class="form-group">
-        {{ form.description.label }} {{ form.description }}
+       Описание {{ form.description }}
     </div>
     <div class="form-group">
-        {{ form.price.label }} {{ form.price }}
+        Цена {{ form.price }}
     </div>
     <div class="form-group">
-        {{ form.partner_info.label }} {{ form.partner_info }}
+        Информация о партнёре {{ form.partner_info }}
     </div>
     <div class="form-group">
-        {{ form.city.label }} {{ form.city }}
+        Город {{ form.city }}
     </div>
     <div class="form-group">
-        {{ form.availability.label }} {{ form.availability }}
+        Доступность {{ form.availability }}
     </div>
     <div class="form-group">
-        {{ form.shelter_id.label }} {{ form.shelter_id }}
+       ID приюта {{ form.shelter_id }}
     </div>
     <div class="form-group">
-        {{ form.image_file.label }} {{ form.image_file }}
+        Загрузить фотографию {{ form.image_file }}
     </div>
     <div class="form-group">
         {{ form.submit }}

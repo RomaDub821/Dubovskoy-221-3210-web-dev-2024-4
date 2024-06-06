@@ -56,7 +56,7 @@ def favorites():
 @login_required
 def add_pet():
     if current_user.role not in ['representative', 'moderator']:
-        flash('Access denied', 'danger')
+        flash('Доступ запрещен', 'danger')
         return redirect(url_for('main.index'))
 
     shelters = Shelter.query.all()
@@ -163,7 +163,7 @@ def add_to_favorites(pet_id):
 @login_required
 def add_shelter():
     if current_user.role != 'moderator':
-        flash('Access denied', 'danger')
+        flash('Доступ запрещен', 'danger')
         return redirect(url_for('main.index'))
 
     form = AddShelterForm()
