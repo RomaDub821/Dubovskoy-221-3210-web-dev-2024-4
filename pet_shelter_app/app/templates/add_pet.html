@@ -1,55 +1,52 @@
 {% extends "base.html" %}
 
-{% block title %}Добавить питомца{% endblock %}
+{% block title %}Добавить Питомца{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h2>Добавить питомца</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-           Имя {{ form.name }}
-        </div>
-        <div class="form-group">
-            Размер {{ form.size }}
-        </div>
-        <div class="form-group">
-            Возраст {{ form.age }}
-        </div>
-        <div class="form-group">
-            Окрас {{ form.color }}
-        </div>
-        <div class="form-group">
-           Длина шерсти {{ form.hair_length }}
-        </div>
-        <div class="form-group">
-           Пол {{ form.gender }}
-        </div>
-        <div class="form-group">
-            Описание {{ form.description }}
-        </div>
-        <div class="form-group">
-            Стоимость {{ form.price }}
-        </div>
-        <div class="form-group">
-           Информация {{ form.partner_info }}
-        </div>
-        <div class="form-group">
-           Город {{ form.city }}
-        </div>
-        <div class="form-group">
-            Доступность {{ form.availability }}
-        </div>
-        <div class="form-group">
-           Приют {{ form.shelter_id }}
-        </div>
-        <div class="form-group">
-            <label for="photo">Загрузить фото:</label>
-            <input type="file" name="photo" id="photo">
-        </div>
-        <div class="form-group">
-            {{ form.submit }}
-        </div>
-    </form>
-</div>
+<h2>Добавить Питомца</h2>
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.name.label }} {{ form.name }}
+    </div>
+    <div class="form-group">
+        {{ form.size.label }} {{ form.size }}
+    </div>
+    <div class="form-group">
+        {{ form.age.label }} {{ form.age }}
+    </div>
+    <div class="form-group">
+        {{ form.color.label }} {{ form.color }}
+    </div>
+    <div class="form-group">
+        {{ form.hair_length.label }} {{ form.hair_length }}
+    </div>
+    <div class="form-group">
+        {{ form.gender.label }} {{ form.gender }}
+    </div>
+    <div class="form-group">
+        {{ form.description.label }} {{ form.description }}
+    </div>
+    <div class="form-group">
+        {{ form.price.label }} {{ form.price }}
+    </div>
+    <div class="form-group">
+        {{ form.partner_info.label }} {{ form.partner_info }}
+    </div>
+    <div class="form-group">
+        {{ form.city.label }} {{ form.city }}
+    </div>
+    <div class="form-group">
+        {{ form.availability.label }} {{ form.availability }}
+    </div>
+    <div class="form-group">
+        {{ form.shelter_id.label }} {{ form.shelter_id }}
+    </div>
+    <div class="form-group">
+        {{ form.image_file.label }} {{ form.image_file }}
+    </div>
+    <div class="form-group">
+        {{ form.submit }}
+    </div>
+</form>
 {% endblock %}

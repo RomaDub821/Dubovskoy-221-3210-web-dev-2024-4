@@ -2,10 +2,10 @@
 {% block title %}Account{% endblock %}
 {% block content %}
 <h2>Личный кабинет</h2>
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.account') }}">
     {{ edit_form.hidden_tag() }}
     <div class="form-group">
-       Изменить Имя {{ edit_form.name }}
+        Изменить Имя {{ edit_form.name }}
     </div>
     <div class="form-group">
         Изменить Фамилию {{ edit_form.surname }}
@@ -28,12 +28,17 @@
     <div class="form-group">
         Изменить Предпочтения {{ edit_form.preferences }}
     </div>
+    {% if current_user.role == 'representative' %}
+    <div class="form-group">
+        Изменить Приют {{ edit_form.shelter_id }}
+    </div>
+    {% endif %}
     <div class="form-group">
         {{ edit_form.submit }}
     </div>
 </form>
 <h3>Загрузить аватар профиля</h3>
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.account') }}">
     {{ avatar_form.hidden_tag() }}
     <div class="form-group">
         Аватар {{ avatar_form.avatar }}

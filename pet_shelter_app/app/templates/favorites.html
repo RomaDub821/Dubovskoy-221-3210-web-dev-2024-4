@@ -3,14 +3,23 @@
 {% block title %}Избранное{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <h2>Избранные питомцы</h2>
-        <ul>
-            {% for favorite in favorites %}
-                <li>{{ favorite.pet.name }} - <a href="{{ url_for('main.pet_details', pet_id=favorite.pet.id) }}">Подробнее</a></li>
-            {% endfor %}
-        </ul>
+<h2>Избранные питомцы</h2>
+<div class="row">
+    {% for favorite in favorites %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <img src="{{ url_for('media', filename=favorite.pet.image_file) }}" alt="{{ favorite.pet.name }}" class="card-img-top">
+            <div class="card-body">
+                <h5 class="card-title">{{ favorite.pet.name }}</h5>
+                <p class="card-text">Возраст: {{ favorite.pet.age }}</p>
+                <p class="card-text">Город: {{ favorite.pet.city }}</p>
+                <a href="{{ url_for('main.pet_details', pet_id=favorite.pet.id) }}" class="btn btn-primary">Подробнее</a>
+                <form action="{{ url_for('main.remove_from_favorites', pet_id=favorite.pet.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-secondary">Удалить из избранного</button>
+                </form>
+            </div>
+        </div>
     </div>
+    {% endfor %}
 </div>
 {% endblock %}

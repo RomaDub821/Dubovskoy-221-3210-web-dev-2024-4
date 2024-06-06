@@ -1,9 +1,17 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+import os
+from flask import Blueprint, current_app, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app import db
 from app.models import Favorites, Pet, Shelter, User
 from app.forms import AddPetForm, AddShelterForm, EditUserForm, FilterPetsForm
-
+from werkzeug.utils import secure_filename
+import os
+from flask import Blueprint, current_app, render_template, request, flash, redirect, url_for
+from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
+from app import db
+from app.models import Pet, Shelter
+from app.forms import AddPetForm
 main = Blueprint('main', __name__)
 
 @main.route('/', methods=['GET', 'POST'])
@@ -25,8 +33,17 @@ def index():
         if form.price_max.data:
             query = query.filter(Pet.price <= form.price_max.data)
 
-    pets = query.all()
-    return render_template('index.html', pets=pets, form=form)
+    page = request.args.get('page', 1, type=int)
+    pets = query.paginate(page=page, per_page=9)
+
+    return render_template('index.html', pets=pets.items, form=form, pagination=pets)
+
+@main.route('/pet/<int:pet_id>')
+def pet_details(pet_id):
+    pet = Pet.query.get_or_404(pet_id)
+    return render_template('pet_details.html', pet=pet)
+
+
 
 @main.route('/favorites')
 @login_required
@@ -38,11 +55,20 @@ def favorites():
 @main.route('/add_pet', methods=['GET', 'POST'])
 @login_required
 def add_pet():
-    if current_user.role != 'representative':
+    if current_user.role not in ['representative', 'moderator']:
         flash('Access denied', 'danger')
         return redirect(url_for('main.index'))
+
+    shelters = Shelter.query.all()
     form = AddPetForm()
+    form.shelter_id.choices = [(shelter.id, shelter.name) for shelter in shelters]
+
     if form.validate_on_submit():
+        filename = None
+        if form.image_file.data:
+            filename = secure_filename(form.image_file.data.filename)
+            form.image_file.data.save(os.path.join(current_app.config['UPLOADED_PHOTOS_DEST'], filename))
+
         pet = Pet(
             name=form.name.data,
             size=form.size.data,
@@ -56,7 +82,8 @@ def add_pet():
             city=form.city.data,
             availability=form.availability.data,
             shelter_id=form.shelter_id.data,
-            user_id=current_user.id
+            user_id=current_user.id,
+            image_file=filename
         )
         db.session.add(pet)
         db.session.commit()
@@ -64,13 +91,81 @@ def add_pet():
         return redirect(url_for('main.index'))
     return render_template('add_pet.html', form=form)
 
+
+@main.route('/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
+@login_required
+def edit_pet(pet_id):
+    pet = Pet.query.get_or_404(pet_id)
+    if current_user.role != 'moderator' and (current_user.role == 'representative' and pet.shelter_id != current_user.shelter_id):
+        flash('У вас нет доступа для редактирования этого питомца.', 'danger')
+        return redirect(url_for('main.index'))
+
+    form = AddPetForm(obj=pet)
+    shelters = Shelter.query.all()
+    form.shelter_id.choices = [(shelter.id, shelter.name) for shelter in shelters]
+
+    if form.validate_on_submit():
+        pet.name = form.name.data
+        pet.size = form.size.data
+        pet.age = form.age.data
+        pet.color = form.color.data
+        pet.hair_length = form.hair_length.data
+        pet.gender = form.gender.data
+        pet.description = form.description.data
+        pet.price = form.price.data
+        pet.partner_info = form.partner_info.data
+        pet.city = form.city.data
+        pet.availability = form.availability.data
+        pet.shelter_id = form.shelter_id.data
+        if form.image_file.data:
+            filename = secure_filename(form.image_file.data.filename)
+            form.image_file.data.save(os.path.join(current_app.config['UPLOADED_PHOTOS_DEST'], filename))
+            pet.image_file = filename
+        db.session.commit()
+        flash('Питомец обновлен!', 'success')
+        return redirect(url_for('main.pet_details', pet_id=pet.id))
+
+    return render_template('edit_pet.html', form=form, pet=pet)
+
+@main.route('/delete_pet/<int:pet_id>', methods=['POST'])
+@login_required
+def delete_pet(pet_id):
+    pet = Pet.query.get_or_404(pet_id)
+    if current_user.role == 'moderator' or (current_user.role == 'representative' and pet.shelter_id == current_user.shelter_id):
+        db.session.delete(pet)
+        db.session.commit()
+        flash('Питомец удален!', 'success')
+        return redirect(url_for('main.index'))
+    else:
+        flash('У вас нет прав для удаления этого питомца.', 'danger')
+        return redirect(url_for('main.index'))
+
+
+
+
+@main.route('/add_to_favorites/<int:pet_id>', methods=['POST'])
+@login_required
+def add_to_favorites(pet_id):
+    pet = Pet.query.get_or_404(pet_id)
+    favorite = Favorites.query.filter_by(user_id=current_user.id, pet_id=pet_id).first()
+    if favorite:
+        flash('Питомец уже добавлен в избранное!', 'info')
+    else:
+        favorite = Favorites(user_id=current_user.id, pet_id=pet_id)
+        db.session.add(favorite)
+        db.session.commit()
+        flash('Питомец добавлен в избранное!', 'success')
+    return redirect(url_for('main.index'))
+
+
+
 @main.route('/add_shelter', methods=['GET', 'POST'])
 @login_required
 def add_shelter():
-    if current_user.role not in ['moderator', 'representative']:
-        flash('У вас нет доступа для добавления приюта.', 'danger')
+    if current_user.role != 'moderator':
+        flash('Access denied', 'danger')
         return redirect(url_for('main.index'))
-    
+
     form = AddShelterForm()
     if form.validate_on_submit():
         shelter = Shelter(
@@ -83,7 +178,7 @@ def add_shelter():
         )
         db.session.add(shelter)
         db.session.commit()
-        flash('Приют добавлен!', 'success')
+        flash('Shelter added successfully!', 'success')
         return redirect(url_for('main.index'))
     return render_template('add_shelter.html', form=form)
 
@@ -135,3 +230,16 @@ def delete_user(user_id):
     db.session.commit()
     flash('Пользователь удален!', 'success')
     return redirect(url_for('main.manage_users'))
+
+
+@main.route('/remove_from_favorites/<int:pet_id>', methods=['POST'])
+@login_required
+def remove_from_favorites(pet_id):
+    favorite = Favorites.query.filter_by(user_id=current_user.id, pet_id=pet_id).first()
+    if favorite:
+        db.session.delete(favorite)
+        db.session.commit()
+        flash('Питомец удален из избранного!', 'success')
+    else:
+        flash('Питомец не найден в избранном!', 'danger')
+    return redirect(url_for('main.favorites'))

@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+import os
+from flask import Flask, render_template, send_from_directory, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -17,6 +18,10 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # Create the upload directory if it doesn't exist
+    if not os.path.exists(app.config['UPLOADED_PHOTOS_DEST']):
+        os.makedirs(app.config['UPLOADED_PHOTOS_DEST'])
+
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
@@ -28,7 +33,10 @@ def create_app(config_class=Config):
     from app.auth import auth_bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
-    # Обработчик ошибок
+    @app.route('/media/<path:filename>')
+    def media(filename):
+        return send_from_directory(current_app.config['UPLOADED_PHOTOS_DEST'], filename)
+
     @app.errorhandler(Exception)
     def handle_exception(e):
         if isinstance(e, HTTPException):

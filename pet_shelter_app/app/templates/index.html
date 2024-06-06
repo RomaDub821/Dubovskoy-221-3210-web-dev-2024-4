@@ -7,54 +7,67 @@
     <h2>Добро пожаловать в приют для домашних животных "Собачки в ручки"</h2>
     <p>Наша цель - уменьшить количество животных без хозяина и увеличить количество людей с питомцами!</p>
 </div>
-<div class="card-container">
-    {% for pet in pets %}
-    <div class="card">
-        <img src="{{ url_for('static', filename='images/' ~ pet.image_file) }}" alt="{{ pet.name }}">
-        <h2>{{ pet.name }}</h2>
-        <p>Возраст: {{ pet.age }}</p>
-        <p>Город: {{ pet.city }}</p>
-        <a href="{{ url_for('main.pet_details', pet_id=pet.id) }}" class="btn">Подробнее</a>
-        <form action="{{ url_for('main.add_to_favorites', pet_id=pet.id) }}" method="POST">
-            <button type="submit" class="btn">Добавить в избранное</button>
-        </form>
-    </div>
-    {% endfor %}
-    <h2>Питомцы</h2>
-<form method="POST">
+
+<h2>Фильтры</h2>
+<form method="POST" class="form-inline mb-3">
     {{ form.hidden_tag() }}
-    <div>
+    <div class="form-group mx-2">
         Возраст {{ form.age }}
     </div>
-    <div>
+    <div class="form-group mx-2">
         Размер {{ form.size }}
     </div>
-    <div>
+    <div class="form-group mx-2">
        Окрас {{ form.color }}
     </div>
-    <div>
+    <div class="form-group mx-2">
         Пол {{ form.gender }}
     </div>
-    <div>
+    <div class="form-group mx-2">
         Минимальная стоимость {{ form.price_min }}
     </div>
-    <div>
+    <div class="form-group mx-2">
         Максимальная стоимость {{ form.price_max }}
     </div>
-    <div>
-        {{ form.submit }}
-    </div>
+    <button type="submit" class="btn btn-primary">Применить</button>
 </form>
-<div>
-    {% for pet in pets %}  //Ошибка из-за pets ыместо pet
-        <div class="pet-card">
-            <h3>{{ pet.name }}</h3>
-            <p>{{ pet.description }}</p>
-            <p><strong>Возраст:</strong> {{ pet.age }}</p>
-            <p><strong>Размер:</strong> {{ pet.size }}</p>
-            <p><strong>Цена:</strong> {{ pet.price }}</p> 
+
+<div class="row">
+    {% for pet in pets %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <img src="{{ url_for('media', filename=pet.image_file) }}" alt="{{ pet.name }}" class="card-img-top">
+            <div class="card-body">
+                <h5 class="card-title">{{ pet.name }}</h5>
+                <p class="card-text">Возраст: {{ pet.age }}</p>
+                <p class="card-text">Город: {{ pet.city }}</p>
+                <a href="{{ url_for('main.pet_details', pet_id=pet.id) }}" class="btn btn-primary">Подробнее</a>
+                <form action="{{ url_for('main.add_to_favorites', pet_id=pet.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-secondary">Добавить в избранное</button>
+                </form>
+            </div>
         </div>
+    </div>
     {% endfor %}
 </div>
-</div>
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for('main.index', page=pagination.prev_num) }}" tabindex="-1">Предыдущая</a>
+    </li>
+    {% for page_num in pagination.iter_pages() %}
+      {% if page_num %}
+        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('main.index', page=page_num) }}">{{ page_num }}</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><a class="page-link" href="#">…</a></li>
+      {% endif %}
+    {% endfor %}
+    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for('main.index', page=pagination.next_num) }}">Следующая</a>
+    </li>
+  </ul>
+</nav>
 {% endblock %}

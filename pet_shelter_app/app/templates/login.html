@@ -3,22 +3,21 @@
 {% block title %}Вход{% endblock %}
 
 {% block content %}
-<div class="card">
+<div class="container mt-4">
     <h2>Вход</h2>
     <form method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            Почта {{ form.email }}
+            {{ form.email.label }} {{ form.email(class="form-control") }}
         </div>
         <div class="form-group">
-            Пароль {{ form.password }}
+            {{ form.password.label }} {{ form.password(class="form-control") }}
         </div>
-        <div class="form-group">
-            {{ form.remember }} Запомнить меня
+        <div class="form-group form-check">
+            {{ form.remember(class="form-check-input") }}
+            {{ form.remember.label(class="form-check-label") }}
         </div>
-        <div class="form-group">
-            {{ form.submit }}
-        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
 </div>
 {% endblock %}

@@ -2,11 +2,13 @@ from typing import Optional
 from flask_wtf import FlaskForm
 from wtforms import FileField, StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, TextAreaField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from app.models import User, Pet
+from app.models import Shelter, User, Pet
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, NumberRange
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DecimalField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, NumberRange
+from flask_wtf.file import FileAllowed, FileRequired
+
 
 class RegistrationForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=50)])
@@ -19,13 +21,19 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     role = SelectField('Role', choices=[('user', 'User'), ('representative', 'Representative'), ('moderator', 'Moderator')], validators=[DataRequired()])
+    shelter = SelectField('Shelter', coerce=int, validators=[Optional()])  # Поле для выбора приюта
     preferences = TextAreaField('Preferences', validators=[Optional(), Length(max=200)])
     submit = SubmitField('Sign Up')
+
+    def __init__(self, *args, **kwargs):
+        super(RegistrationForm, self).__init__(*args, **kwargs)
+        self.shelter.choices = [(shelter.id, shelter.name) for shelter in Shelter.query.all()]
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
+        
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -42,10 +50,11 @@ class AddPetForm(FlaskForm):
     gender = SelectField('Gender', choices=[('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     price = DecimalField('Price', validators=[DataRequired()])
-    partner_info = TextAreaField('Partner Info', validators=[Length(max=200)])
+    partner_info = TextAreaField('Partner Info', validators=[Optional(), Length(max=200)])
     city = StringField('City', validators=[DataRequired(), Length(min=2, max=100)])
     availability = BooleanField('Available', default=True)
     shelter_id = SelectField('Shelter', coerce=int, validators=[DataRequired()])
+    image_file = FileField('Upload Image', validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField('Add Pet')
 
 class AddShelterForm(FlaskForm):
@@ -67,6 +76,7 @@ class EditUserForm(FlaskForm):
     city = StringField('City', validators=[DataRequired(), Length(min=2, max=50)])
     role = SelectField('Role', choices=[('user', 'User'), ('representative', 'Representative'), ('moderator', 'Moderator')], validators=[DataRequired()])
     preferences = TextAreaField('Preferences', validators=[Optional(), Length(max=200)])
+    shelter_id = SelectField('Shelter', coerce=int, validators=[Optional()])
     submit = SubmitField('Save Changes')
 
 class FilterPetsForm(FlaskForm):
@@ -81,3 +91,5 @@ class FilterPetsForm(FlaskForm):
 class UploadAvatarForm(FlaskForm):
     avatar = FileField('Upload Avatar', validators=[DataRequired()])
     submit = SubmitField('Upload')
+
+    

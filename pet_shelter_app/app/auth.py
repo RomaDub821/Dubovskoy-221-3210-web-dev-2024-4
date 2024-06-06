@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
 from app import db, bcrypt
@@ -10,12 +10,11 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        new_user = User(
+        shelter_id = form.shelter.data if form.role.data == 'representative' else None
+        user = User(
             name=form.name.data,
             surname=form.surname.data,
             patronymic=form.patronymic.data,
@@ -25,13 +24,15 @@ def register():
             city=form.city.data,
             password=hashed_password,
             role=form.role.data,
+            shelter_id=shelter_id,
             preferences=form.preferences.data
         )
-        db.session.add(new_user)
+        db.session.add(user)
         db.session.commit()
-        flash('Ваш аккаунт был создан!', 'success')
-        return redirect(url_for('main.index'))
-    return render_template('register.html', title='Регистрация', form=form)
+        flash('Your account has been created!', 'success')
+        return redirect(url_for('auth.login'))
+    return render_template('register.html', title='Register', form=form)
+
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -58,6 +59,9 @@ def edit_user(user_id):
 
     user = User.query.get_or_404(user_id)
     form = EditUserForm(obj=user)
+    
+    shelters = Shelter.query.all()
+    form.shelter_id.choices = [(shelter.id, shelter.name) for shelter in shelters] if shelters else []
 
     if form.validate_on_submit():
         user.name = form.name.data
@@ -69,6 +73,7 @@ def edit_user(user_id):
         user.city = form.city.data
         user.role = form.role.data
         user.preferences = form.preferences.data
+        user.shelter_id = form.shelter_id.data if form.shelter_id.data else None
         db.session.commit()
         flash('User updated successfully', 'success')
         return redirect(url_for('auth.manage_users'))
@@ -83,6 +88,12 @@ def account():
     edit_form = EditUserForm(obj=user)
     avatar_form = UploadAvatarForm()
 
+    if user.role == 'representative':
+        shelters = Shelter.query.all()
+        edit_form.shelter_id.choices = [(shelter.id, shelter.name) for shelter in shelters]
+    else:
+        edit_form.shelter_id.choices = []  # Очищаем choices для других ролей
+
     if edit_form.validate_on_submit() and 'edit_user' in request.form:
         user.name = edit_form.name.data
         user.surname = edit_form.surname.data
@@ -92,6 +103,11 @@ def account():
         user.address = edit_form.address.data
         user.city = edit_form.city.data
         user.preferences = edit_form.preferences.data
+        user.role = edit_form.role.data
+        if user.role == 'representative' and edit_form.shelter_id.data:
+            user.shelter_id = edit_form.shelter_id.data
+        else:
+            user.shelter_id = None  # Очищаем shelter_id для других ролей
         db.session.commit()
         flash('Account updated successfully', 'success')
         return redirect(url_for('auth.account'))
@@ -99,25 +115,38 @@ def account():
     if avatar_form.validate_on_submit() and 'upload_avatar' in request.form:
         avatar = avatar_form.avatar.data
         filename = secure_filename(avatar.filename)
-        avatar.save(os.path.join('path/to/save', filename))
-        user.avatar_id = filename
+        avatar.save(os.path.join(current_app.config['UPLOADED_PHOTOS_DEST'], filename))
+        user.avatar = filename
         db.session.commit()
         flash('Avatar updated successfully', 'success')
         return redirect(url_for('auth.account'))
 
     return render_template('account.html', user=user, edit_form=edit_form, avatar_form=avatar_form, pets=pets)
 
+
+
+
+
+
+
+
 @auth_bp.route('/delete_user/<int:user_id>', methods=['POST'])
 @login_required
 def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
     if current_user.role != 'moderator':
         flash('Access denied', 'danger')
-        return redirect(url_for('main.index'))
-
-    user = User.query.get_or_404(user_id)
+        return redirect(url_for('auth.manage_users'))
+    
+    # Отвязать всех питомцев, связанных с пользователем
+    pets = Pet.query.filter_by(user_id=user_id).all()
+    for pet in pets:
+        pet.user_id = None  # Отвязать питомца от пользователя
+        db.session.add(pet)
+    
     db.session.delete(user)
     db.session.commit()
-    flash('User deleted successfully', 'success')
+    flash('Пользователь удален, питомцы отвязаны!', 'success')
     return redirect(url_for('auth.manage_users'))
 
 @auth_bp.route('/delete_account', methods=['POST'])
@@ -149,13 +178,13 @@ def logout():
 @auth_bp.route('/add_shelter', methods=['GET', 'POST'])
 @login_required
 def add_shelter():
-    if current_user.role not in ['representative', 'moderator']:
+    if current_user.role != 'moderator':
         flash('Access denied', 'danger')
         return redirect(url_for('main.index'))
 
     form = AddShelterForm()
     if form.validate_on_submit():
-        new_shelter = Shelter(
+        shelter = Shelter(
             name=form.name.data,
             phone_number=form.phone_number.data,
             email=form.email.data,
@@ -163,10 +192,10 @@ def add_shelter():
             city=form.city.data,
             zip_code=form.zip_code.data
         )
-        db.session.add(new_shelter)
+        db.session.add(shelter)
         db.session.commit()
-        flash('Shelter added successfully', 'success')
-        return redirect(url_for('auth.manage_shelters'))
+        flash('Приют добавлен!', 'success')
+        return redirect(url_for('main.index'))
     return render_template('add_shelter.html', form=form)
 
 @auth_bp.route('/manage_shelters', methods=['GET'])

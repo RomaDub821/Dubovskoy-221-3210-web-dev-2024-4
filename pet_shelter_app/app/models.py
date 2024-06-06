@@ -17,13 +17,16 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(50), nullable=False, default='user')
     preferences = db.Column(db.Text, nullable=True)
     password = db.Column(db.String(255), nullable=False)
-    avatar_id = db.Column(db.Integer, db.ForeignKey('avatar.id'), nullable=True)
-    favorites = db.relationship('Favorites', back_populates='user')
-    avatar = db.relationship('Avatar', backref='user', uselist=False)
+    avatar = db.Column(db.String(100), nullable=True)
+    shelter_id = db.Column(db.Integer, db.ForeignKey('shelter.id'), nullable=True)
+    favorites = db.relationship('Favorites', back_populates='user', cascade='all, delete-orphan')
+    shelter = db.relationship('Shelter', back_populates='users', foreign_keys=[shelter_id])
 
     def __repr__(self):
         return f"User('{self.name}', '{self.email}', '{self.role}')"
 
+
+    
 class Pet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -39,10 +42,11 @@ class Pet(db.Model):
     availability = db.Column(db.Boolean, nullable=False)
     shelter_id = db.Column(db.Integer, db.ForeignKey('shelter.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    favorites = db.relationship('Favorites', back_populates='pet')
+    image_file = db.Column(db.String(100), nullable=True)
+    favorites = db.relationship('Favorites', back_populates='pet', cascade='all, delete-orphan')
+
     def __repr__(self):
         return f"Pet('{self.name}', '{self.city}', '{self.price}')"
-
 
 class Avatar(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,11 +62,13 @@ class Shelter(db.Model):
     city = db.Column(db.String(100), nullable=False)
     zip_code = db.Column(db.String(20), nullable=False)
     pets = db.relationship('Pet', backref='shelter', lazy=True)
+    users = db.relationship('User', back_populates='shelter')
 
 
 class Favorites(db.Model):
     __tablename__ = 'favorites'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    pet_id = db.Column(db.Integer, db.ForeignKey('pet.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    pet_id = db.Column(db.Integer, db.ForeignKey('pet.id', ondelete='CASCADE'), primary_key=True)
     user = db.relationship('User', back_populates='favorites')
-    pet = db.relationship('Pet')
+    pet = db.relationship('Pet', back_populates='favorites')
+

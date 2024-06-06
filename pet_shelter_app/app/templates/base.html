@@ -12,10 +12,15 @@
         <nav>
             <ul>
                 <li><a href="{{ url_for('main.index') }}">Главная</a></li>
+                <li><a href="{{ url_for('main.favorites') }}">Избранное</a></li>
                 {% if current_user.is_authenticated %}
                 <div class="avatar-container">
                     <li><a href="{{ url_for('auth.account') }}">
-                        <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar_id) }}" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
+                        {% if current_user.avatar %}
+                            <img src="{{ url_for('media', filename=current_user.avatar) }}" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='default_avatar.png') }}" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
+                        {% endif %}
                     </a></li>
                 </div>
                     {% if current_user.role in ['representative', 'moderator'] %}
@@ -25,6 +30,7 @@
                     <li><a href="{{ url_for('auth.logout') }}">Выйти</a></li>
                     {% if current_user.role == 'moderator' %}
                         <li><a href="{{ url_for('auth.manage_users') }}">Управление пользователями</a></li>
+                        <li><a href="{{ url_for('main.add_shelter') }}">Создать приют</a></li>
                     {% endif %}
                 {% else %}
                     <li><a href="{{ url_for('auth.login') }}">Войти</a></li>
@@ -47,6 +53,9 @@
     </main>
     <footer class="text-center mt-4">
         <p>&copy; 2024 Собачки в ручки. Все права защищены.</p>
+        {% if current_user.is_authenticated and current_user.avatar %}
+            <img src="{{ url_for('media', filename=current_user.avatar) }}" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%; float: right;">
+        {% endif %}
     </footer>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

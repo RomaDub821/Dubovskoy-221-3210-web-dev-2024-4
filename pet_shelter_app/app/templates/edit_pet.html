@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать питомца{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Редактировать питомца</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="name">Имя</label>
+            {{ form.name(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="size">Размер</label>
+            {{ form.size(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="age">Возраст</label>
+            {{ form.age(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="color">Цвет</label>
+            {{ form.color(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="hair_length">Длина шерсти</label>
+            {{ form.hair_length(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="gender">Пол</label>
+            {{ form.gender(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="description">Описание</label>
+            {{ form.description(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="price">Цена</label>
+            {{ form.price(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="partner_info">Информация о партнёре</label>
+            {{ form.partner_info(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="city">Город</label>
+            {{ form.city(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="availability">Доступность</label>
+            {{ form.availability(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="shelter_id">Приют</label>
+            {{ form.shelter_id(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="image_file">Фото</label>
+            {{ form.image_file(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</div>
+{% endblock %}
