@@ -12,24 +12,29 @@
 <form method="POST" class="form-inline mb-3">
     {{ form.hidden_tag() }}
     <div class="form-group mx-2">
-        Возраст {{ form.age }}
+        Возраст {{ form.age(class="form-control") }}
     </div>
     <div class="form-group mx-2">
-        Размер {{ form.size }}
+        Размер {{ form.size(class="form-control") }}
     </div>
     <div class="form-group mx-2">
-       Окрас {{ form.color }}
+       Окрас {{ form.color(class="form-control") }}
     </div>
     <div class="form-group mx-2">
-        Пол {{ form.gender }}
+        Пол {{ form.gender(class="form-control") }}
     </div>
     <div class="form-group mx-2">
-        Минимальная стоимость {{ form.price_min }}
+        Минимальная стоимость {{ form.price_min(class="form-control") }}
     </div>
     <div class="form-group mx-2">
-        Максимальная стоимость {{ form.price_max }}
+        Максимальная стоимость {{ form.price_max(class="form-control") }}
     </div>
-    <button type="submit" class="btn btn-primary">Применить</button>
+    <div class="form-group mx-2">
+        Сортировка {{ form.sort_by(class="form-control") }}
+    </div>
+    <div class="form-group mx-2">
+        <button type="submit" class="btn btn-primary">Применить</button>
+    </div>
 </form>
 
 <div class="row">

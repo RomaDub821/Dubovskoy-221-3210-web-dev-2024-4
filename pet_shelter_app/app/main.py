@@ -32,7 +32,16 @@ def index():
             query = query.filter(Pet.price >= form.price_min.data)
         if form.price_max.data:
             query = query.filter(Pet.price <= form.price_max.data)
-
+        if form.sort_by.data:
+            if form.sort_by.data == 'age_asc':
+                query = query.order_by(Pet.age.asc())
+            elif form.sort_by.data == 'age_desc':
+                query = query.order_by(Pet.age.desc())
+            elif form.sort_by.data == 'created_at_asc':
+                query = query.order_by(Pet.created_at.asc())
+            elif form.sort_by.data == 'created_at_desc':
+                query = query.order_by(Pet.created_at.desc())
+    
     page = request.args.get('page', 1, type=int)
     pets = query.paginate(page=page, per_page=9)
 

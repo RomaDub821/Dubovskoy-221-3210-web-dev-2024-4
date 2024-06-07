@@ -2,12 +2,9 @@ from typing import Optional
 from flask_wtf import FlaskForm
 from wtforms import FileField, StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, TextAreaField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from app.models import Shelter, User, Pet
+from app.models import Shelter, User
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, NumberRange
-from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, DecimalField, SelectField, SubmitField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, NumberRange
-from flask_wtf.file import FileAllowed, FileRequired
+from flask_wtf.file import FileAllowed
 
 
 class RegistrationForm(FlaskForm):
@@ -21,7 +18,7 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     role = SelectField('Role', choices=[('user', 'User'), ('representative', 'Representative'), ('moderator', 'Moderator')], validators=[DataRequired()])
-    shelter = SelectField('Shelter', coerce=int, validators=[Optional()])  # Поле для выбора приюта
+    shelter = SelectField('Shelter', coerce=int, validators=[Optional()])
     preferences = TextAreaField('Preferences', validators=[Optional(), Length(max=200)])
     submit = SubmitField('Sign Up')
 
@@ -83,13 +80,16 @@ class FilterPetsForm(FlaskForm):
     age = IntegerField('Age', validators=[Optional()])
     size = StringField('Size', validators=[Optional(), Length(min=1, max=50)])
     color = StringField('Color', validators=[Optional(), Length(min=2, max=50)])
-    gender = SelectField('Gender', choices=[('', 'Any'), ('Male', 'Male'), ('Female', 'Female')], validators=[Optional()])
+    gender = SelectField('Gender', choices=[('', 'Любой'), ('male', 'Мальчик'), ('female', 'Девочка')], validators=[Optional()])
     price_min = DecimalField('Min Price', validators=[Optional(), NumberRange(min=0)])
     price_max = DecimalField('Max Price', validators=[Optional(), NumberRange(min=0)])
-    submit = SubmitField('Filter')
-
+    sort_by = SelectField('Sort By', choices=[
+        ('age_asc', 'Возраст: От младшего к старшему'),
+        ('age_desc', 'Возраст: От старшего к младшему'),
+        ('created_at_asc', 'Дата добавления: От старой к новой'),
+        ('created_at_desc', 'Дата добавления: От новой к старой')
+    ], validators=[Optional()])
+    submit = SubmitField('Apply Filters')
 class UploadAvatarForm(FlaskForm):
     avatar = FileField('Upload Avatar', validators=[DataRequired()])
     submit = SubmitField('Upload')
-
-    
