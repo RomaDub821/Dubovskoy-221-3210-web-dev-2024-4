@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<div class="row">
+    {% for book in books.items %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img class="card-img-top" src="{{ url_for('static', filename=book.cover.file_name) }}" alt="Обложка книги">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">{{ book.short_description }}</p>
+                    <p class="card-text"><small class="text-muted">{{ book.year }}</small></p>
+                    <p class="card-text"><small class="text-muted">{{ book.genres|join(', ') }}</small></p>
+                    <p class="card-text">Средняя оценка: {{ book.average_rating }}</p>
+                    <p class="card-text">Рецензий: {{ book.reviews_count }}</p>
+                    <a href="{{ url_for('main.book_view', book_id=book.id) }}" class="btn btn-primary">Просмотр</a>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role in ['administrator', 'moderator'] %}
+                            <a href="{{ url_for('main.book_edit', book_id=book.id) }}" class="btn btn-secondary">Редактировать</a>
+                        {% endif %}
+                        {% if current_user.role == 'administrator' %}
+                            <a href="{{ url_for('main.book_delete', book_id=book.id) }}" class="btn btn-danger">Удалить</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div class="pagination">
+    {{ books.links }}
+</div>
+{% if current_user.is_authenticated and current_user.role == 'administrator' %}
+    <a href="{{ url_for('main.book_add') }}" class="btn btn-success">Добавить книгу</a>
+{% endif %}
+{% endblock %}
