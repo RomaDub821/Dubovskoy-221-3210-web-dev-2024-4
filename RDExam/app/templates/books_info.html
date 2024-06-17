@@ -21,7 +21,7 @@
 <div class="reviews">
     {% for review in book.reviews %}
         <div class="review">
-            <p><strong>{{ review.user.fio }}:</strong> Оценка {{ review.rating }}</p>
+            <p><strong>{{ review.user.name }} {{ review.user.surname }}:</strong> Оценка {{ review.rating }}</p>
             <p>{{ review.text }}</p>
         </div>
     {% endfor %}

@@ -50,7 +50,6 @@
     <a href="{{ url_for('book_add') }}" class="btn btn-success">Добавить книгу</a>
 {% endif %}
 
-<!-- Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -71,3 +70,19 @@
   </div>
 </div>
 {% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var bookId = button.getAttribute('data-bookid');
+        var bookTitle = button.getAttribute('data-booktitle');
+        var modalTitle = deleteModal.querySelector('#bookTitle');
+        modalTitle.textContent = bookTitle;
+
+        var deleteForm = deleteModal.querySelector('#deleteForm');
+        deleteForm.setAttribute('action', '/book/delete/' + bookId);
+    });
+});
+</script>

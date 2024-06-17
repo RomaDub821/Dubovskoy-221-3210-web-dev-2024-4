@@ -12,7 +12,7 @@ class Book(db.Model):
     cover_id = db.Column(db.Integer, db.ForeignKey('cover.id'), nullable=True)
     cover = db.relationship('Cover', back_populates='books')
     genres = db.relationship('Genre', secondary='book_genre', back_populates='books')
-    reviews = db.relationship('Review', back_populates='book')
+    reviews = db.relationship('Review', back_populates='book', cascade="all, delete-orphan")
 
     @property
     def average_rating(self):
@@ -26,7 +26,6 @@ class Cover(db.Model):
     mime_type = db.Column(db.String(100), nullable=False)
     md5_hash = db.Column(db.String(100), nullable=False)
     books = db.relationship('Book', back_populates='cover')
-
 
 class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
