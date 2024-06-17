@@ -1,4 +1,5 @@
 from app import db
+from flask_login import UserMixin
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -8,9 +9,16 @@ class Book(db.Model):
     publisher = db.Column(db.String(100), nullable=False)
     author = db.Column(db.String(100), nullable=False)
     pages = db.Column(db.Integer, nullable=False)
-    cover_id = db.Column(db.Integer, db.ForeignKey('cover.id'), nullable=False)
+    cover_id = db.Column(db.Integer, db.ForeignKey('cover.id'), nullable=True)
+    cover = db.relationship('Cover', back_populates='books')
     genres = db.relationship('Genre', secondary='book_genre', back_populates='books')
     reviews = db.relationship('Review', back_populates='book')
+
+    @property
+    def average_rating(self):
+        if self.reviews:
+            return sum(review.rating for review in self.reviews) / len(self.reviews)
+        return None
 
 class Cover(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,6 +26,7 @@ class Cover(db.Model):
     mime_type = db.Column(db.String(100), nullable=False)
     md5_hash = db.Column(db.String(100), nullable=False)
     books = db.relationship('Book', back_populates='cover')
+
 
 class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +48,7 @@ class Review(db.Model):
     book = db.relationship('Book', back_populates='reviews')
     user = db.relationship('User', back_populates='reviews')
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -47,6 +56,7 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     patronymic = db.Column(db.String(100), nullable=True)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False)
+    role = db.relationship('Role', back_populates='users')
     reviews = db.relationship('Review', back_populates='user')
 
 class Role(db.Model):

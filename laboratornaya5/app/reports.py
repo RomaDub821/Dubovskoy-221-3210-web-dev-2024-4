@@ -1,5 +1,6 @@
 import io
-from flask import Blueprint, redirect, render_template, request, send_file, flash
+from flask import Blueprint, redirect, render_template, request, send_file, flash, url_for
+from flask_login import current_user, login_required
 from app import db_connector
 from mysql.connector.errors import DatabaseError
 import csv
@@ -34,6 +35,13 @@ def index():
 
     return render_template('visit_logs.html', logs=logs, page=page, per_page=per_page, total_logs=total_logs)
 
+@reports_bp.before_request
+@login_required
+def check_admin():
+    if not current_user.is_admin():
+        flash("У вас недостаточно прав для доступа к данной странице.", "warning")
+        return redirect(url_for('index'))
+
 @reports_bp.route('/users_stat')
 def users_stat():
     logs = []
@@ -55,6 +63,24 @@ def users_stat():
 
 @reports_bp.route('/pages_stat')
 def pages_stat():
+    pages = []
+    try:
+        db_connection = db_connector.connect()
+        with db_connection.cursor(named_tuple=True) as cursor:
+            query = ("SELECT path, COUNT(*) as visit_count FROM visit_logs GROUP BY path ORDER BY visit_count DESC")
+            cursor.execute(query)
+            pages = cursor.fetchall()
+    except DatabaseError as error:
+        print(f"Database error occurred: {error}")
+        flash(f"Произошла ошибка при получении данных отчёта по страницам: {error}", "danger")
+        return render_template('pages_report.html', pages=[])
+    finally:
+        db_connection.close()
+
+    return render_template('pages_report.html', pages=pages)
+
+@reports_bp.route('/pages_report')
+def pages_report():
     pages = []
     try:
         db_connection = db_connector.connect()
@@ -95,6 +121,7 @@ def pages_report_csv():
     finally:
         db_connection.close()
 
+
 @reports_bp.route('/users_report')
 def users_report():
     users = []
@@ -116,26 +143,39 @@ def users_report():
 
     return render_template('users_report.html', users=users)
 
-@reports_bp.route('/users_report.csv')
+@reports_bp.route('/users_report_csv')
+@login_required
 def users_report_csv():
+    if not current_user.is_admin():
+        flash("У вас недостаточно прав для доступа к данной странице.", "warning")
+        return redirect(url_for("index"))
+
     try:
         db_connection = db_connector.connect()
         with db_connection.cursor(named_tuple=True) as cursor:
-            query = ("SELECT users.login, COUNT(*) as visit_count "
-                     "FROM visit_logs LEFT JOIN users ON visit_logs.user_id = users.id "
-                     "GROUP BY users.id "
+            query = ("SELECT users.login, COUNT(visit_logs.id) as visit_count "
+                     "FROM visit_logs "
+                     "LEFT JOIN users ON visit_logs.user_id = users.id "
+                     "GROUP BY users.login "
                      "ORDER BY visit_count DESC")
             cursor.execute(query)
             rows = cursor.fetchall()
 
-            output = io.BytesIO()
+            print("Rows fetched:", rows) 
+
+            output = io.StringIO()
             writer = csv.writer(output)
             writer.writerow(['User', 'Visit Count'])
             for row in rows:
-                writer.writerow([row.login, row.visit_count])
+                writer.writerow([row.login or "Неавторизованные пользователи", row.visit_count])
+            
             output.seek(0)
-
-            return send_file(output, mimetype='text/csv', download_name='users_report.csv', as_attachment=True)
+            return send_file(
+                io.BytesIO(output.getvalue().encode('utf-8')),
+                mimetype='text/csv',
+                download_name='users_report.csv',
+                as_attachment=True
+            )
     except DatabaseError as error:
         print(f"Database error occurred: {error}")
         flash(f"Произошла ошибка при экспорте данных отчёта по пользователям: {error}", "danger")

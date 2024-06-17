@@ -37,6 +37,11 @@
             {% endif %}
             {% if page > 2 %}
             <li class="page-item">
+                <a class="page-link" href="{{ url_for('logs.index', page=page-2) }}">{{ page-2 }}</a>
+            </li>
+            {% endif %}
+            {% if page > 1 %}
+            <li class="page-item">
                 <a class="page-link" href="{{ url_for('logs.index', page=page-1) }}">{{ page-1 }}</a>
             </li>
             {% endif %}
@@ -46,6 +51,11 @@
             {% if page < total_pages %}
             <li class="page-item">
                 <a class="page-link" href="{{ url_for('logs.index', page=page+1) }}">{{ page+1 }}</a>
+            </li>
+            {% endif %}
+            {% if page < total_pages - 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('logs.index', page=page+2) }}">{{ page+2 }}</a>
             </li>
             {% endif %}
             {% if page < total_pages %}
