@@ -33,8 +33,8 @@ class Genre(db.Model):
     books = db.relationship('Book', secondary='book_genre', back_populates='genres')
 
 book_genre = db.Table('book_genre',
-    db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
-    db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'), primary_key=True)
+    db.Column('book_id', db.Integer, db.ForeignKey('book.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('genre_id', db.Integer, db.ForeignKey('genre.id', ondelete='CASCADE'), primary_key=True)
 )
 
 class Review(db.Model):

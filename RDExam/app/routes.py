@@ -46,6 +46,7 @@ def book_add():
             book = Book(title=form.title.data, description=description_sanitized, year=form.year.data,
                         publisher=form.publisher.data, author=form.author.data, pages=form.pages.data,
                         cover_id=cover.id if cover else None)
+            book.genres = [Genre.query.get(id) for id in form.genres.data]
             db.session.add(book)
             db.session.commit()
             flash('Книга добавлена', 'success')

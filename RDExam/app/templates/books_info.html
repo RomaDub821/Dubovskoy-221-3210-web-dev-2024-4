@@ -4,7 +4,6 @@
 <div class="row">
     <div class="col-md-4">
         <img src="{{ url_for('media', filename=book.cover.filename) }}" class="img-fluid" alt="Обложка книги">
-
     </div>
     <div class="col-md-8">
         <h2>{{ book.title }}</h2>
@@ -12,7 +11,7 @@
         <p><strong>Год:</strong> {{ book.year }}</p>
         <p><strong>Издательство:</strong> {{ book.publisher }}</p>
         <p><strong>Автор:</strong> {{ book.author }}</p>
-        <p><strong>Жанры:</strong> {{ book.genres | genres_list }}</p>
+        <p><strong>Жанры:</strong> {{ book.genres | map(attribute='name') | join(', ') }}</p>
         <p><strong>Средняя оценка:</strong> {{ book.average_rating }}</p>
     </div>
 </div>
